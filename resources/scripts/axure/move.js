@@ -74,25 +74,19 @@
         return rootLayer;
     };
 
-    $ax.move.MoveWidget = function (id, x, y, options, to, animationCompleteCallback, shouldFire, jobj, skipOnMoveEvent) {
-        var moveInfo = $ax.move.RegisterMoveInfo(id, x, y, to, options, jobj);
+    $ax.move.MoveWidget = function (id, x, y, options, to, animationCompleteCallback, shouldFire, jobj, moveInfo) {
         $ax.drag.LogMovedWidgetForDrag(id, options.dragInfo);
 
-        var object = $obj(id);
-        if(object && $ax.public.fn.IsLayer(object.type)) {
-            var childrenIds = $ax.public.fn.getLayerChildrenDeep(id, true);
-            if(!skipOnMoveEvent) for(var i = 0; i < childrenIds.length; i++) $ax.move.RegisterMoveInfo(childrenIds[i], x, y, to, options);;
-        }
-
-        //if(!moveInfo) moveInfo = _getMoveInfo(id, x, y, to, options, jobj);
+        if(!moveInfo) moveInfo = _getMoveInfo(id, x, y, to, options, jobj);
 
         jobj = moveInfo.jobj;
 
         _moveElement(id, options, animationCompleteCallback, shouldFire, jobj, moveInfo);
 
-        if(skipOnMoveEvent) return;
         $ax.event.raiseSyntheticEvent(id, "onMove");
-        if(childrenIds) {
+        var object = $obj(id);
+        if(object && $ax.public.fn.IsLayer(object.type)) {
+            var childrenIds = $ax.public.fn.getLayerChildrenDeep(id, true);
             for(var i = 0; i < childrenIds.length; i++) $ax.event.raiseSyntheticEvent(childrenIds[i], 'onMove');
         }
     };
